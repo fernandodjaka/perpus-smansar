@@ -70,11 +70,19 @@
                         <!-- Theme Selector -->
                         <div class="relative" x-data="{
                             open: false,
-                            currentTheme: window.themeManager ? window.themeManager.getTheme() : 'light',
+                            currentTheme: localStorage.getItem('theme') || 'light',
                             setTheme(t) {
                                 this.currentTheme = t;
                                 this.open = false;
-                                if (window.themeManager) window.themeManager.setTheme(t);
+                                localStorage.setItem('theme', t);
+                                if (t === 'dark') {
+                                    document.documentElement.classList.add('dark');
+                                    document.documentElement.setAttribute('data-theme', 'dark');
+                                } else {
+                                    document.documentElement.classList.remove('dark');
+                                    document.documentElement.setAttribute('data-theme', 'light');
+                                }
+                                window.dispatchEvent(new CustomEvent('theme-changed', { detail: t }));
                             }
                         }" x-on:theme-changed.window="currentTheme = $event.detail" @click.outside="open = false">
                             <button @click="open = !open"
@@ -86,20 +94,24 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                                 </svg>
                             </button>
-
+ 
                             <div x-show="open" x-transition
                                 class="absolute right-0 top-10 w-32 rounded-lg shadow-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-50 overflow-hidden py-1">
                                 <button @click="setTheme('light')"
                                     class="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors"
                                     :class="currentTheme === 'light' ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'">
                                     <span>Terang</span>
-                                    <span x-show="currentTheme === 'light'" class="ml-auto">✓</span>
+                                    <template x-if="currentTheme === 'light'">
+                                        <span class="ml-auto text-indigo-650 dark:text-indigo-400">✓</span>
+                                    </template>
                                 </button>
                                 <button @click="setTheme('dark')"
                                     class="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors"
                                     :class="currentTheme === 'dark' ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'">
                                     <span>Gelap</span>
-                                    <span x-show="currentTheme === 'dark'" class="ml-auto">✓</span>
+                                    <template x-if="currentTheme === 'dark'">
+                                        <span class="ml-auto text-indigo-650 dark:text-indigo-400">✓</span>
+                                    </template>
                                 </button>
                             </div>
                         </div>

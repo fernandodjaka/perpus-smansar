@@ -52,11 +52,19 @@ new class extends Component
                 <!-- Theme Selector -->
                 <div class="relative me-3" x-data="{
                     open: false,
-                    currentTheme: window.themeManager ? window.themeManager.getTheme() : 'light',
+                    currentTheme: localStorage.getItem('theme') || 'light',
                     setTheme(t) {
                         this.currentTheme = t;
                         this.open = false;
-                        if (window.themeManager) window.themeManager.setTheme(t);
+                        localStorage.setItem('theme', t);
+                        if (t === 'dark') {
+                            document.documentElement.classList.add('dark');
+                            document.documentElement.setAttribute('data-theme', 'dark');
+                        } else {
+                            document.documentElement.classList.remove('dark');
+                            document.documentElement.setAttribute('data-theme', 'light');
+                        }
+                        window.dispatchEvent(new CustomEvent('theme-changed', { detail: t }));
                     }
                 }" x-on:theme-changed.window="currentTheme = $event.detail" @click.outside="open = false">
                     <!-- Trigger button -->
@@ -94,9 +102,11 @@ new class extends Component
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
                             </svg>
                             <span>Terang</span>
-                            <svg x-show="currentTheme === 'light'" class="w-3.5 h-3.5 ml-auto text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                            </svg>
+                            <template x-if="currentTheme === 'light'">
+                                <svg class="w-3.5 h-3.5 ml-auto text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </template>
                         </button>
 
                         <!-- Gelap -->
@@ -109,9 +119,11 @@ new class extends Component
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                             </svg>
                             <span>Gelap</span>
-                            <svg x-show="currentTheme === 'dark'" class="w-3.5 h-3.5 ml-auto text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                            </svg>
+                            <template x-if="currentTheme === 'dark'">
+                                <svg class="w-3.5 h-3.5 ml-auto text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </template>
                         </button>
                     </div>
                 </div>
